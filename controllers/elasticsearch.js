@@ -55,15 +55,7 @@ module.exports = {
         created: false,
       };
     }
-    if (status.created && !_.isEmpty(map.body[index])) {
-      //
-      status.hasMapping = true;
-      //
-    } else {
-      //
-      status.hasMapping = false;
-      //
-    }
+    status.hasMapping = status.created && !_.isEmpty(map[index]?.mappings);
     try {
       data = await strapi.elastic.search({
         index,
@@ -85,11 +77,11 @@ module.exports = {
     } catch (e) {
       return ctx.send({ data: null, total: 0, status });
     }
-
-    if (data.statusCode !== 200) return ctx.badRequest();
+    // TODO: Find a way to check if the search was successful
+    // if (data.statusCode !== 200) return ctx.badRequest();
 
     const res = [];
-    for (const item of data.body.hits.hits) {
+    for (const item of data.hits.hits) {
       const source = item['_source'];
       if (!_.isEmpty(source)) {
         //
